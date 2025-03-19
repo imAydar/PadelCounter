@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padel Score</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            background: #f4f4f4;
+        }
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+        .player {
+            width: 45%;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            font-size: 20px;
+            padding: 10px;
+            margin: 10px;
+            width: 80%;
+            border: none;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:active {
+            background: #218838;
+        }
+        .reset {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎾 Padel Score</h1>
+    <div class="score-container">
+        <div class="player">
+            <h2>Player 1</h2>
+            <p id="score1">0</p>
+            <button onclick="updateScore(1)">+ Point</button>
+        </div>
+        <div class="player">
+            <h2>Player 2</h2>
+            <p id="score2">0</p>
+            <button onclick="updateScore(2)">+ Point</button>
+        </div>
+    </div>
+    <button class="reset" onclick="resetScore()">Reset</button>
+
+    <script>
+        function updateScore(player) {
+            let scoreElement = document.getElementById("score" + player);
+            let currentScore = parseInt(scoreElement.innerText);
+            scoreElement.innerText = currentScore + 1;
+        }
+
+        function resetScore() {
+            document.getElementById("score1").innerText = "0";
+            document.getElementById("score2").innerText = "0";
+        }
+    </script>
+</body>
+</html>
