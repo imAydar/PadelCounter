@@ -10,60 +10,107 @@
             text-align: center;
             font-family: Arial, sans-serif;
             font-size: 18px;
-            background: #f4f4f4;
+            background: #1E1E2E; /* Dark blue (Padel-inspired) */
+            color: white;
+            margin: 0;
+            padding: 20px;
         }
         .score-container {
             display: flex;
             justify-content: space-around;
             margin: 20px;
         }
-        .player {
+        .team {
             width: 45%;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            background: #2A2A3A; /* Slightly lighter blue */
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .score {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
         }
         button {
-            font-size: 20px;
+            font-size: 18px;
             padding: 10px;
-            margin: 10px;
+            margin: 5px;
             width: 80%;
             border: none;
-            background: #28a745;
-            color: white;
-            border-radius: 5px;
+            background: #32CD32; /* Neon green */
+            color: black;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: bold;
         }
         button:active {
-            background: #218838;
+            background: #28A428;
+        }
+        .minus {
+            background: #FF6347; /* Bright red */
         }
         .reset {
-            background: #dc3545;
+            background: #FFD700; /* Yellow */
+            color: black;
+            margin-top: 20px;
+        }
+        select {
+            font-size: 16px;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: none;
+            background: #FFD700; /* Yellow */
+            color: black;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h1>🎾 Padel Score</h1>
+
     <div class="score-container">
-        <div class="player">
-            <h2>Player 1</h2>
-            <p id="score1">0</p>
-            <button onclick="updateScore(1)">+ Point</button>
+        <div class="team">
+            <h2>Team 1</h2>
+            <p class="score" id="score1">0</p>
+            <button onclick="updateScore(1, 1)">+ Point</button>
+            <button class="minus" onclick="updateScore(1, -1)">- Point</button>
         </div>
-        <div class="player">
-            <h2>Player 2</h2>
-            <p id="score2">0</p>
-            <button onclick="updateScore(2)">+ Point</button>
+        <div class="team">
+            <h2>Team 2</h2>
+            <p class="score" id="score2">0</p>
+            <button onclick="updateScore(2, 1)">+ Point</button>
+            <button class="minus" onclick="updateScore(2, -1)">- Point</button>
         </div>
     </div>
+
+    <label for="scoreMode">Scoring Mode:</label>
+    <select id="scoreMode" onchange="changeScoringMode()">
+        <option value="1">Americano</option>
+        <option value="15">Game</option>
+    </select>
+
     <button class="reset" onclick="resetScore()">Reset</button>
 
     <script>
-        function updateScore(player) {
-            let scoreElement = document.getElementById("score" + player);
+        let scoreMode = [1, 2, 3]; // Default: Americano
+
+        function changeScoringMode() {
+            let mode = document.getElementById("scoreMode").value;
+            scoreMode = mode == "15" ? [0, 15, 30, 40] : [0, 1, 2, 3];
+            resetScore(); // Reset scores when switching modes
+        }
+
+        function updateScore(team, value) {
+            let scoreElement = document.getElementById("score" + team);
             let currentScore = parseInt(scoreElement.innerText);
-            scoreElement.innerText = currentScore + 1;
+
+            // Get the next valid score based on the mode
+            let index = scoreMode.indexOf(currentScore) + (value > 0 ? 1 : -1);
+            if (index < 0) index = 0; // Prevent negative scores
+            if (index >= scoreMode.length) index = scoreMode.length - 1; // Prevent exceeding max score
+
+            scoreElement.innerText = scoreMode[index];
         }
 
         function resetScore() {
