@@ -2,85 +2,111 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Padel Score</title>
     <link rel="manifest" href="manifest.json">
     <style>
         body {
             text-align: center;
             font-family: Arial, sans-serif;
-            font-size: 18px;
-            background: #1E1E2E; /* Dark blue (Padel-inspired) */
+            font-size: 20px;
+            background: #1E1E2E;
             color: white;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            user-select: none;
         }
+
         .score-container {
             display: flex;
-            justify-content: space-around;
-            margin: 20px;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 10px;
         }
+
         .team {
-            width: 45%;
-            padding: 20px;
-            background: #2A2A3A; /* Slightly lighter blue */
+            flex: 1;
+            padding: 10px;
+            background: #2A2A3A;
             border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 5px;
         }
+
         .score {
-            font-size: 36px;
+            font-size: 50px;
             font-weight: bold;
             margin: 10px 0;
         }
+
         button {
-            font-size: 18px;
-            padding: 10px;
+            font-size: 24px;
+            padding: 12px;
             margin: 5px;
-            width: 80%;
+            width: 100%;
             border: none;
-            background: #32CD32; /* Neon green */
+            background: #32CD32;
             color: black;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: bold;
         }
+
         button:active {
             background: #28A428;
         }
+
         .minus {
-            background: #FF6347; /* Bright red */
+            background: #FF6347;
         }
+
         .reset {
-            background: #FFD700; /* Yellow */
+            background: #FFD700;
             color: black;
-            margin-top: 20px;
+            margin-top: 10px;
+            font-size: 22px;
+            padding: 12px;
+            width: 80%;
         }
+
         select {
-            font-size: 16px;
-            padding: 10px;
-            margin-top: 20px;
+            font-size: 18px;
+            padding: 8px;
             border-radius: 8px;
             border: none;
-            background: #FFD700; /* Yellow */
+            background: #FFD700;
             color: black;
             font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .highlight {
+            background: #50C878;
         }
     </style>
 </head>
 <body>
 
     <div class="score-container">
-        <div class="team">
+        <div class="team" id="team1">
             <h2>Team 1</h2>
             <p class="score" id="score1">0</p>
-            <button onclick="updateScore(1, 1)">+ Point</button>
-            <button class="minus" onclick="updateScore(1, -1)">- Point</button>
+            <button onclick="updateScore(1, 1)">+1</button>
+            <button class="minus" onclick="updateScore(1, -1)">-1</button>
         </div>
-        <div class="team">
+        <div class="team" id="team2">
             <h2>Team 2</h2>
             <p class="score" id="score2">0</p>
-            <button onclick="updateScore(2, 1)">+ Point</button>
-            <button class="minus" onclick="updateScore(2, -1)">- Point</button>
+            <button onclick="updateScore(2, 1)">+1</button>
+            <button class="minus" onclick="updateScore(2, -1)">-1</button>
         </div>
     </div>
 
@@ -90,33 +116,65 @@
         <option value="15">Game</option>
     </select>
 
-    <button class="reset" onclick="resetScore()">Reset</button>
+    <button class="reset" onclick="confirmReset()">Reset</button>
 
     <script>
-        let scoreMode = [1, 2, 3]; // Default: Americano
+        let maxAmericanoScore = 16; 
+        let scoreMode = Array.from({ length: maxAmericanoScore + 1 }, (_, i) => i); // Default: Americano
+        // Set limit for Americano mode
 
         function changeScoringMode() {
             let mode = document.getElementById("scoreMode").value;
-            scoreMode = mode == "15" ? [0, 15, 30, 40] : [0, 1, 2, 3];
-            resetScore(); // Reset scores when switching modes
+            if (mode == "15") {
+                scoreMode = [0, 15, 30, 40]; // Padel Game Mode
+            } else {
+                scoreMode = Array.from({ length: maxAmericanoScore + 1 }, (_, i) => i); // 0 to max
+            }
+            resetScore();
         }
 
         function updateScore(team, value) {
             let scoreElement = document.getElementById("score" + team);
             let currentScore = parseInt(scoreElement.innerText);
 
-            // Get the next valid score based on the mode
             let index = scoreMode.indexOf(currentScore) + (value > 0 ? 1 : -1);
             if (index < 0) index = 0; // Prevent negative scores
-            if (index >= scoreMode.length) index = scoreMode.length - 1; // Prevent exceeding max score
+            if (index >= scoreMode.length) index = scoreMode.length - 1; // Prevent exceeding max
 
             scoreElement.innerText = scoreMode[index];
+
+            highlightLeader();
+        }
+
+        function confirmReset() {
+            if (confirm("Are you sure you want to reset the score?")) {
+                resetScore();
+            }
         }
 
         function resetScore() {
             document.getElementById("score1").innerText = "0";
             document.getElementById("score2").innerText = "0";
+            document.getElementById("team1").classList.remove("highlight");
+            document.getElementById("team2").classList.remove("highlight");
+        }
+
+        function highlightLeader() {
+            let score1 = parseInt(document.getElementById("score1").innerText);
+            let score2 = parseInt(document.getElementById("score2").innerText);
+            let team1 = document.getElementById("team1");
+            let team2 = document.getElementById("team2");
+
+            team1.classList.remove("highlight");
+            team2.classList.remove("highlight");
+
+            if (score1 > score2) {
+                team1.classList.add("highlight");
+            } else if (score2 > score1) {
+                team2.classList.add("highlight");
+            }
         }
     </script>
+
 </body>
 </html>
